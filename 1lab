@@ -1,0 +1,144 @@
+#include <windows.h>
+#include <stdio.h>
+#include <iostream>
+
+
+void GetNames(char buffer[], DWORD size)
+{
+	GetComputerNameA(buffer, &size);
+	printf("name of computer: %s\n", buffer);
+	GetUserNameA(buffer, &size);
+	printf("name of user: %s\n", buffer);
+}
+void way(char buffer[], DWORD size) {
+
+	GetWindowsDirectoryA(buffer, size);
+	printf("way to calatog: %s\n", buffer);
+
+	GetWindowsDirectoryA(buffer, size);
+	printf("way to system catalog: %s\n", buffer);
+
+	GetTempPathA(size, buffer);
+	printf("way to calatog of time files: %s\n", buffer);
+}
+void metrics() {
+	int cx = GetSystemMetrics(SM_CXSCREEN);
+	int cy = GetSystemMetrics(SM_CYSCREEN); 
+	int cfx = GetSystemMetrics(SM_CXFULLSCREEN);
+	int cfy = GetSystemMetrics(SM_CYFULLSCREEN);
+
+	printf("width of window is:%d\n", cx);
+	printf("height of window is:%d\n", cy);
+	printf("width of fullscreen window is:%d\n",cfx);
+	printf("height of fullscreen window is:%d\n",cfy);
+
+};
+
+
+
+void version() {
+	system("ver");
+}
+
+void parametrs() {
+	long a;
+	
+	bool IsActive;
+	
+	SystemParametersInfo(SPI_GETACCESSTIMEOUT, 0, &IsActive, 0);
+	printf("SPI_GETFONTSMOOTHING is:%d\n",IsActive);
+	SystemParametersInfo(SPI_GETBEEP, 0, &a, 0);
+	printf("SPI_GETBEEP:%d\n", a);
+
+}
+void getcolors() {
+	DWORD dwResult, dwResult1;
+	dwResult=GetSysColor(COLOR_WINDOW);
+	printf("COLOR_WINDOW:%lu\n", dwResult);
+	dwResult1= GetSysColor(COLOR_ACTIVECAPTION);
+	printf("COLOR_ACTIVECAPTION is:%lu\n", dwResult1);
+}
+
+void setcolors() {
+	// Элементы окна, которые будут изменены.
+int aiElements[3] = { COLOR_ACTIVEBORDER, COLOR_ACTIVECAPTION, COLOR_WINDOW };
+// Массив RGB значений.
+DWORD aColors[3];
+
+// Определяем новые цвета.
+
+aColors[0] = RGB(0x80, 0x00, 0x80);  // светло-серый
+aColors[1] = RGB(0x00, 0x80, 0x80);  // тёмно-голубой
+aColors[2] = RGB(0x00, 0x80, 0x80);  
+
+// Присваиваем значениям aiElements цвета из
+// массива aColors.
+
+printf("new:%d\n",SetSysColors(3, aiElements, aColors));
+
+}
+
+void time() {
+	SYSTEMTIME sm;
+	GetLocalTime(&sm);
+	printf("time is:%d\n", sm.wMinute);
+}
+
+void mish() {
+	RECT r1;
+	RECT r2;
+	if (GetClipCursor(&r1))
+	{
+		SetRect(&r2, 1, 1, 50, 50);
+		if (ClipCursor(&r2))
+		{
+			printf("Clip Cursor\n");
+			Sleep(10000);
+			ClipCursor(&r1);
+		}
+		else printf( "Error Clip Cursor");
+	}
+	else printf("Error GetClipCursor ");
+}
+
+void keyboard() {
+	int t1,typeR;
+	typeR= GetKeyboardType(0);
+	printf("Key Board Type is:%d\n", typeR);
+
+}
+
+void menu() {
+	printf("does have mish:%p\n", GetCapture());
+}
+
+void red() {
+	printf("how many red:%d\n",GetRValue(98,240,98));
+
+}
+
+
+
+int main()
+{
+	char buffer[256] = "";
+	DWORD size = sizeof(buffer);
+	GetNames(buffer, size);
+	way(buffer, size);
+	version();
+	metrics();
+	parametrs();
+	getcolors();
+	setcolors();
+	time();
+	mish();
+	keyboard();
+	menu();
+	red();
+	
+
+	
+	
+
+
+}
