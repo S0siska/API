@@ -1,0 +1,138 @@
+#include <iostream>
+#include <Windows.h>
+#include <tlhelp32.h>
+
+using namespace std;
+
+void first() 
+{
+	cout << "Первое задание лабораторной работы:" << endl;
+	char name[] = "ос2.exe";
+	HMODULE hmodule = GetModuleHandleA(name);
+	cout << "Дескриптор модуля ос2.exe: " << hmodule << endl;
+
+	char buffer[MAX_PATH];
+	GetModuleFileNameA(hmodule, buffer, MAX_PATH);
+	cout << "Путь к файлу  ос2.exe: " << buffer << endl;
+	cout << "  " << endl;
+
+
+	char name2[] = "User32.dll";
+	HMODULE hmodule2 = GetModuleHandleA(name2);
+	cout << "Дескриптор модуля User32.dll: " << hmodule2 << endl;
+	char buffer2[MAX_PATH];
+	GetModuleFileNameA(hmodule2, buffer2, MAX_PATH);
+	cout << "Путь к файлу User32.dll:: " << buffer2 << endl;
+	cout << "       " << endl;
+	
+
+}
+
+void second()
+{
+	cout << "Второе задание лабораторной работы:" << endl;
+	//идентификатор
+	DWORD rez= GetCurrentProcessId();
+	printf("ID текущего процесса:%d\n", rez);
+	//псевдодескриптор
+	HANDLE rez1=GetCurrentProcess();
+	printf("Псевдодескриптор текущего процесса:%d\n", GetCurrentProcess());
+	//дескриптор 
+	HANDLE hProcess = NULL;
+	HANDLE hMutex = CreateMutex(NULL, FALSE, NULL);
+	HANDLE hMutexDup;
+	DuplicateHandle(GetCurrentProcess(), hMutex, GetCurrentProcess(), &hMutexDup, 0, FALSE, 0);
+	printf("Дескриптор текущего процесса:%d\n", hMutexDup);
+	//копия дескриптора 
+	HANDLE openp = OpenProcess(PROCESS_ALL_ACCESS, TRUE, GetCurrentProcessId());
+	printf("Дескриптор, полученный по идентификатору:%p\n",openp);
+	//закрытие дескрипроторов
+	CloseHandle(hProcess);
+	CloseHandle(openp);
+	cout << "       " << endl;
+}
+void proc()
+{
+	HANDLE sn;
+	PROCESSENTRY32 ippe;
+	sn = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	ippe.dwSize = sizeof(PROCESSENTRY32);
+	Process32First(sn, &ippe);
+	do 
+	{
+		cout << "Идентификатор процесса: " << ippe.th32ProcessID << endl;
+		cout << "Количество потоков выполнения: " << ippe.cntThreads << endl;
+		cout << "Родительский ID: " << ippe.th32ParentProcessID << endl;
+		cout << "Приоритет: " << ippe.pcPriClassBase << endl;
+		printf("Исполняемый файл:%ws\n", ippe.szExeFile);
+		cout << "------------------------------------------------" << endl;
+		
+	}while (Process32Next(sn, &ippe));
+
+	CloseHandle(sn);
+	cout << "  " << endl;
+}
+void potoki()
+{
+	HANDLE sn2 = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+	THREADENTRY32 ippe2;
+	ippe2.dwSize = sizeof(THREADENTRY32);
+	Thread32First(sn2, &ippe2);
+	do
+	{
+		cout << "Идентификатор потока: " << ippe2.th32ThreadID << endl;
+		cout << "Идентификатор процесса, создавшего поток: " << ippe2.th32OwnerProcessID << endl;
+		cout << "Базовый уровень приоритета потока: " << ippe2.tpBasePri << endl;
+		cout << "------------------------------------------------" << endl;
+	} while (Thread32Next(sn2, &ippe2));
+	CloseHandle(sn2);
+	cout << "  " << endl;
+}
+
+void modul()
+{
+	HANDLE sn3 = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, 0);
+	MODULEENTRY32 ippe3;
+	ippe3.dwSize = sizeof(MODULEENTRY32);
+	Module32First(sn3, &ippe3);
+	do
+	{
+		cout << "Размер модуля в байтах: " << ippe3.modBaseSize << endl;
+		cout << "Дескриптор модуля в контексте процесса-владельца: " << ippe3.hModule << endl;
+		printf("Имя модуля:%ws\n", ippe3.szModule);
+		printf("Путь к модулю:%ws\n", ippe3.szExePath);
+		cout << "------------------------------------------------" << endl;
+
+	} while (Module32Next(sn3, &ippe3));
+	CloseHandle(sn3);
+	cout << "  " << endl;
+}
+
+void main()
+{
+	int n = 0;
+	setlocale(LC_ALL, "Russian");
+	first();
+	second();
+	do
+	{
+		cout << "Чтобы увидеть информацию о процессах, введите 1" << endl;
+		cout << "Чтобы увидеть информацию о потоках, введите 2" << endl;
+		cout << "Чтобы увидеть информацию о модулях, введите 3" << endl;
+		cout << "Для выхода введите 0"<< endl;
+		cin >> n;
+		if (n == 1)
+		{
+			proc();
+		}
+		if (n == 2)
+		{
+			potoki();
+		}
+		if (n == 3)
+		{
+			modul();
+		}
+	} while (n != 0);
+	system("Pause");
+}
